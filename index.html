@@ -1,0 +1,1503 @@
+<!doctype html>
+<html lang="nn">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="description" content="Uoffisiell nynorsk undervisningsplanleggjar inspirert av arbeidsflyten i Spinna." />
+  <title>Spinna – nynorsk · HVL-inspirert</title>
+  <style>
+
+    /*
+      HVL-inspirert UI.
+      Profilfargar frå HVL sin offentlege designmanual:
+      turkis #00AFBA, lys grøn #96DE99, lys blå #64D0DF,
+      oransje #EB6851, gul #F9DE45, blågrøn #008AAF,
+      grøn #009382, mørk blågrøn #004357, burgunder #6D2439.
+    */
+    :root{
+      --hvl-dark:#004357;
+      --hvl-teal:#00AFBA;
+      --hvl-green:#009382;
+      --hvl-blue:#008AAF;
+      --hvl-light-blue:#64D0DF;
+      --hvl-light-green:#96DE99;
+      --hvl-yellow:#F9DE45;
+      --hvl-orange:#EB6851;
+      --hvl-burgundy:#6D2439;
+
+      --ink:#17343b;
+      --muted:#596b70;
+      --bg:#f5f7f7;
+      --paper:#ffffff;
+      --line:#c9d5da;
+      --line-strong:#9fb3ba;
+      --soft-blue:#edf7f9;
+      --soft-green:#eef8f4;
+      --focus:#00AFBA;
+      --shadow:0 8px 26px rgba(0,67,87,.09);
+      --radius:4px;
+
+      --font-ui:"NB Akademie Std", Arial, Helvetica, sans-serif;
+      --font-body:"Lyon Text", Georgia, "Times New Roman", serif;
+    }
+
+    *{box-sizing:border-box}
+
+    html{
+      scroll-behavior:smooth;
+      background:var(--bg);
+    }
+
+    body{
+      margin:0;
+      min-height:100vh;
+      color:var(--ink);
+      background:var(--bg);
+      font-family:var(--font-ui);
+      font-size:16px;
+      line-height:1.55;
+    }
+
+    button,input,textarea,select{
+      font:inherit;
+    }
+
+    button{
+      cursor:pointer;
+    }
+
+    button:focus-visible,
+    input:focus-visible,
+    textarea:focus-visible,
+    select:focus-visible{
+      outline:3px solid var(--hvl-yellow);
+      outline-offset:3px;
+    }
+
+    .app{
+      min-height:100vh;
+      display:grid;
+      grid-template-rows:auto 1fr;
+    }
+
+    /* Toppfelt: mørk HVL-støttefarge og tydeleg gul signallinje */
+    header{
+      min-height:82px;
+      display:flex;
+      align-items:center;
+      justify-content:space-between;
+      gap:24px;
+      padding:14px clamp(18px,4vw,56px);
+      background:var(--hvl-dark);
+      color:#fff;
+      border-bottom:6px solid var(--hvl-yellow);
+      position:sticky;
+      top:0;
+      z-index:50;
+    }
+
+    .brand{
+      display:flex;
+      align-items:center;
+      gap:14px;
+      color:#fff;
+      font-weight:700;
+      letter-spacing:0;
+      font-size:1.35rem;
+    }
+
+    .brand-mark{
+      width:46px;
+      height:46px;
+      display:grid;
+      place-items:center;
+      border-radius:0;
+      background:var(--hvl-teal);
+      color:var(--hvl-dark);
+      font-size:1.35rem;
+      font-weight:800;
+      box-shadow:none;
+    }
+
+    .brand small{
+      display:block;
+      margin-top:1px;
+      color:#dcecef;
+      font-size:.75rem;
+      font-weight:400;
+      letter-spacing:0;
+      text-transform:none;
+    }
+
+    .header-actions{
+      display:flex;
+      gap:10px;
+      align-items:center;
+      flex-wrap:wrap;
+    }
+
+    .btn{
+      border:2px solid var(--hvl-dark);
+      border-radius:2px;
+      background:#fff;
+      color:var(--hvl-dark);
+      padding:10px 16px;
+      min-height:44px;
+      font-weight:700;
+      transition:background .16s ease,color .16s ease,border-color .16s ease,transform .16s ease;
+    }
+
+    .btn:hover{
+      background:var(--soft-blue);
+      transform:translateY(-1px);
+      box-shadow:none;
+    }
+
+    .btn.primary{
+      background:var(--hvl-dark);
+      color:#fff;
+      border-color:var(--hvl-dark);
+    }
+
+    .btn.primary:hover{
+      background:#003444;
+      border-color:#003444;
+    }
+
+    header .btn{
+      border-color:#fff;
+      background:transparent;
+      color:#fff;
+    }
+
+    header .btn:hover{
+      background:#fff;
+      color:var(--hvl-dark);
+    }
+
+    header .btn.danger{
+      border-color:var(--hvl-yellow);
+      color:var(--hvl-yellow);
+    }
+
+    header .btn.danger:hover{
+      background:var(--hvl-yellow);
+      color:var(--hvl-dark);
+    }
+
+    .btn.ghost{
+      background:transparent;
+    }
+
+    .btn.danger{
+      color:var(--hvl-burgundy);
+    }
+
+    .layout{
+      display:grid;
+      grid-template-columns:minmax(0,1.45fr) minmax(340px,.55fr);
+      gap:28px;
+      padding:clamp(24px,3vw,42px) clamp(18px,4vw,56px) 54px;
+      max-width:1500px;
+      width:100%;
+      margin:0 auto;
+      align-items:start;
+    }
+
+    /* Flater er medvite mindre "app-runde" og meir redaksjonelle */
+    .stage,.panel{
+      background:var(--paper);
+      border:1px solid var(--line);
+      border-radius:0;
+      box-shadow:none;
+    }
+
+    .stage{
+      min-height:calc(100vh - 160px);
+      padding:clamp(26px,3.6vw,52px);
+      position:relative;
+      overflow:hidden;
+      border-top:8px solid var(--hvl-teal);
+    }
+
+    .stage::before{
+      content:"";
+      position:absolute;
+      top:0;
+      right:0;
+      width:120px;
+      height:18px;
+      background:linear-gradient(
+        90deg,
+        var(--hvl-light-green) 0 33.33%,
+        var(--hvl-yellow) 33.33% 66.66%,
+        var(--hvl-orange) 66.66% 100%
+      );
+      pointer-events:none;
+    }
+
+    .eyebrow{
+      display:inline-flex;
+      align-items:center;
+      gap:10px;
+      color:var(--hvl-green);
+      font-size:.82rem;
+      font-weight:700;
+      letter-spacing:0;
+      text-transform:none;
+    }
+
+    .eyebrow::before{
+      content:"";
+      width:30px;
+      height:4px;
+      background:var(--hvl-teal);
+      flex:0 0 auto;
+    }
+
+    h1,h2,h3{
+      font-family:var(--font-ui);
+    }
+
+    h1{
+      font-size:clamp(2.4rem,5vw,5.15rem);
+      line-height:.98;
+      letter-spacing:-.04em;
+      margin:14px 0 18px;
+      max-width:12.5ch;
+      color:var(--hvl-dark);
+      font-weight:800;
+    }
+
+    .lead{
+      font-family:var(--font-body);
+      font-size:clamp(1.05rem,1.45vw,1.22rem);
+      color:#354f56;
+      max-width:64ch;
+      line-height:1.7;
+      margin:0 0 28px;
+    }
+
+    .statusbar{
+      display:flex;
+      gap:10px;
+      flex-wrap:wrap;
+      align-items:center;
+      margin:0 0 26px;
+    }
+
+    .status-pill{
+      display:inline-flex;
+      align-items:center;
+      min-height:38px;
+      padding:8px 12px;
+      border-radius:0;
+      border-left:5px solid var(--hvl-green);
+      background:var(--soft-green);
+      color:var(--hvl-dark);
+      font-weight:700;
+      font-size:.88rem;
+    }
+
+    .status-pill.warn{
+      background:#fff9d9;
+      border-left-color:var(--hvl-yellow);
+    }
+
+    .wheel-wrap{
+      position:relative;
+      display:grid;
+      place-items:center;
+      min-height:610px;
+      padding:12px 0 2px;
+    }
+
+    .wheel{
+      position:relative;
+      width:min(590px,82vw);
+      aspect-ratio:1;
+      border-radius:50%;
+      background:
+        radial-gradient(circle, #fff 0 28%, transparent 28.5%),
+        radial-gradient(circle, rgba(100,208,223,.13) 0 59%, transparent 59.5%),
+        repeating-conic-gradient(
+          from -90deg,
+          rgba(0,67,87,.16) 0deg 1deg,
+          transparent 1deg 32.727deg
+        );
+      border:2px solid var(--hvl-dark);
+      box-shadow:none;
+    }
+
+    .wheel::after{
+      content:"";
+      position:absolute;
+      inset:31%;
+      border-radius:50%;
+      border:1px solid var(--line-strong);
+      pointer-events:none;
+    }
+
+    .center{
+      position:absolute;
+      inset:50% auto auto 50%;
+      transform:translate(-50%,-50%);
+      width:31%;
+      aspect-ratio:1;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      text-align:center;
+      padding:18px;
+      background:var(--hvl-dark);
+      color:#fff;
+      border:7px solid #fff;
+      box-shadow:0 0 0 2px var(--hvl-dark);
+      z-index:4;
+    }
+
+    .center strong{
+      font-size:clamp(1.05rem,2.1vw,1.55rem);
+      line-height:1.08;
+      font-weight:800;
+    }
+
+    .center span{
+      display:block;
+      margin-top:5px;
+      font-size:.74rem;
+      color:#dbeaed;
+    }
+
+    .wheel-item{
+      position:absolute;
+      width:31%;
+      min-height:72px;
+      left:50%;
+      top:50%;
+      transform:
+        translate(-50%,-50%)
+        rotate(var(--a))
+        translateY(-230%)
+        rotate(calc(-1 * var(--a)));
+      border:2px solid var(--hvl-dark);
+      border-radius:2px;
+      padding:10px 12px;
+      background:#fff;
+      color:var(--hvl-dark);
+      box-shadow:0 5px 0 rgba(0,67,87,.10);
+      font-size:clamp(.73rem,1.3vw,.92rem);
+      font-weight:700;
+      line-height:1.18;
+      text-align:center;
+      transition:background .15s ease,color .15s ease,transform .15s ease;
+      z-index:3;
+    }
+
+    .wheel-item:hover,
+    .wheel-item.active{
+      background:var(--hvl-teal);
+      color:#002f3d;
+      transform:
+        translate(-50%,-50%)
+        rotate(var(--a))
+        translateY(-230%)
+        rotate(calc(-1 * var(--a)))
+        scale(1.045);
+    }
+
+    .wheel-item.active{
+      box-shadow:0 6px 0 var(--hvl-dark);
+    }
+
+    .wheel-item.has-value::after{
+      content:attr(data-count);
+      position:absolute;
+      right:-8px;
+      top:-10px;
+      width:27px;
+      height:27px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      background:var(--hvl-yellow);
+      color:var(--hvl-dark);
+      border:2px solid var(--hvl-dark);
+      font-size:.74rem;
+      font-weight:800;
+    }
+
+    .stage-bottom{
+      display:flex;
+      justify-content:center;
+      gap:12px;
+      flex-wrap:wrap;
+      margin-top:22px;
+      padding-top:22px;
+      border-top:1px solid var(--line);
+    }
+
+    .stage-bottom .btn.primary{
+      background:var(--hvl-green);
+      border-color:var(--hvl-green);
+    }
+
+    .stage-bottom .btn.primary:hover{
+      background:#007b6d;
+      border-color:#007b6d;
+    }
+
+    .stage-bottom .btn.primary:disabled{
+      background:#d5dedb;
+      border-color:#d5dedb;
+      color:#6c7a77;
+      cursor:not-allowed;
+      transform:none;
+    }
+
+    .panel{
+      position:sticky;
+      top:112px;
+      overflow:hidden;
+      min-height:620px;
+      border-top:8px solid var(--hvl-green);
+      box-shadow:var(--shadow);
+    }
+
+    .panel-head{
+      padding:26px 26px 22px;
+      border-bottom:1px solid var(--line);
+      background:#fff;
+    }
+
+    .panel-head h2{
+      margin:5px 0 8px;
+      color:var(--hvl-dark);
+      font-size:1.7rem;
+      line-height:1.15;
+      letter-spacing:-.025em;
+      font-weight:800;
+    }
+
+    .panel-head p{
+      margin:0;
+      color:var(--muted);
+      font-family:var(--font-body);
+      font-size:.98rem;
+      line-height:1.6;
+    }
+
+    .panel-body{
+      padding:24px 26px 30px;
+      max-height:calc(100vh - 225px);
+      overflow:auto;
+      scrollbar-color:var(--hvl-teal) #edf2f3;
+    }
+
+    .hint{
+      border:1px solid var(--line);
+      border-left:6px solid var(--hvl-light-blue);
+      border-radius:0;
+      padding:17px 18px;
+      color:#41555b;
+      background:#f8fbfc;
+      line-height:1.65;
+      font-family:var(--font-body);
+    }
+
+    .option-grid{
+      display:flex;
+      gap:9px;
+      flex-wrap:wrap;
+      margin:14px 0 22px;
+    }
+
+    .chip{
+      border:1.5px solid var(--line-strong);
+      background:#fff;
+      color:var(--hvl-dark);
+      padding:9px 12px;
+      min-height:42px;
+      border-radius:2px;
+      font-weight:700;
+      font-size:.9rem;
+      transition:background .14s ease,border-color .14s ease,color .14s ease;
+    }
+
+    .chip:hover{
+      border-color:var(--hvl-teal);
+      background:var(--soft-blue);
+    }
+
+    .chip.selected{
+      background:var(--hvl-dark);
+      color:#fff;
+      border-color:var(--hvl-dark);
+      box-shadow:inset 5px 0 0 var(--hvl-teal);
+    }
+
+    .field{
+      margin:19px 0;
+    }
+
+    .field label{
+      display:block;
+      margin:0 0 7px;
+      color:var(--hvl-dark);
+      font-weight:700;
+      font-size:.92rem;
+    }
+
+    .field input,
+    .field textarea,
+    .field select{
+      width:100%;
+      border:1.5px solid var(--line-strong);
+      border-radius:0;
+      padding:11px 12px;
+      min-height:45px;
+      color:var(--ink);
+      background:#fff;
+      outline:none;
+    }
+
+    .field textarea{
+      min-height:104px;
+      resize:vertical;
+      font-family:var(--font-body);
+      line-height:1.55;
+    }
+
+    .field input:focus,
+    .field textarea:focus,
+    .field select:focus{
+      border-color:var(--hvl-dark);
+      box-shadow:inset 4px 0 0 var(--hvl-teal);
+    }
+
+    .helper{
+      margin-top:7px;
+      color:var(--muted);
+      font-size:.8rem;
+      line-height:1.5;
+    }
+
+    .summary{
+      margin-top:24px;
+      border-top:3px solid var(--hvl-dark);
+      padding-top:17px;
+    }
+
+    .summary h3{
+      margin:0 0 10px;
+      color:var(--hvl-dark);
+      font-size:1rem;
+      font-weight:800;
+    }
+
+    .summary-items{
+      display:grid;
+      gap:0;
+    }
+
+    .summary-row{
+      display:grid;
+      grid-template-columns:minmax(110px,.42fr) minmax(0,.58fr);
+      gap:16px;
+      padding:11px 0;
+      border-bottom:1px solid #e2e9eb;
+      font-size:.86rem;
+    }
+
+    .summary-row b{
+      color:var(--hvl-dark);
+      font-weight:700;
+    }
+
+    .summary-row span{
+      color:var(--muted);
+      text-align:left;
+    }
+
+    .modal-backdrop{
+      position:fixed;
+      inset:0;
+      background:rgba(0,43,56,.62);
+      display:none;
+      place-items:center;
+      padding:18px;
+      z-index:100;
+      backdrop-filter:blur(3px);
+    }
+
+    .modal-backdrop.show{
+      display:grid;
+    }
+
+    .modal{
+      width:min(760px,100%);
+      max-height:92vh;
+      overflow:auto;
+      background:#fff;
+      border-radius:0;
+      border-top:10px solid var(--hvl-teal);
+      box-shadow:0 24px 70px rgba(0,0,0,.30);
+      padding:32px;
+      position:relative;
+    }
+
+    .modal h2{
+      margin:4px 0 12px;
+      color:var(--hvl-dark);
+      font-size:2.15rem;
+      line-height:1.1;
+      letter-spacing:-.035em;
+    }
+
+    .modal p{
+      color:#40575e;
+      line-height:1.68;
+      font-family:var(--font-body);
+    }
+
+    .steps{
+      display:grid;
+      grid-template-columns:repeat(3,1fr);
+      gap:14px;
+      margin:24px 0;
+    }
+
+    .step{
+      border:1px solid var(--line);
+      border-radius:0;
+      padding:17px;
+      background:#fff;
+      border-top:5px solid var(--hvl-light-blue);
+    }
+
+    .step:nth-child(2){
+      border-top-color:var(--hvl-light-green);
+    }
+
+    .step:nth-child(3){
+      border-top-color:var(--hvl-yellow);
+    }
+
+    .step strong{
+      width:34px;
+      height:34px;
+      border-radius:50%;
+      display:grid;
+      place-items:center;
+      margin-bottom:11px;
+      background:var(--hvl-dark);
+      color:#fff;
+    }
+
+    .step b{
+      display:block;
+      margin-bottom:5px;
+      color:var(--hvl-dark);
+    }
+
+    .step span{
+      color:var(--muted);
+      font-family:var(--font-body);
+      font-size:.88rem;
+      line-height:1.5;
+    }
+
+    .modal-actions{
+      display:flex;
+      gap:10px;
+      justify-content:flex-end;
+      flex-wrap:wrap;
+      padding-top:8px;
+    }
+
+    .close{
+      position:absolute;
+      right:18px;
+      top:18px;
+      width:40px;
+      height:40px;
+      border-radius:0;
+      border:2px solid var(--hvl-dark);
+      background:#fff;
+      color:var(--hvl-dark);
+      font-size:1.25rem;
+      line-height:1;
+    }
+
+    .close:hover{
+      background:var(--hvl-dark);
+      color:#fff;
+    }
+
+    .result-modal .modal{
+      width:min(940px,100%);
+      border-top-color:var(--hvl-green);
+    }
+
+    .result{
+      border:1px solid var(--line);
+      border-left:7px solid var(--hvl-teal);
+      background:#fff;
+      border-radius:0;
+      padding:22px 24px;
+      max-height:58vh;
+      overflow:auto;
+      font-family:var(--font-body);
+    }
+
+    .result h3{
+      margin:22px 0 8px;
+      color:var(--hvl-dark);
+      font-family:var(--font-ui);
+      font-size:1.16rem;
+    }
+
+    .result h3:first-child{
+      margin-top:0;
+    }
+
+    .result p,
+    .result li{
+      color:#344c53;
+      line-height:1.68;
+    }
+
+    .result ul{
+      padding-left:1.25rem;
+    }
+
+    .result-toolbar{
+      display:flex;
+      justify-content:space-between;
+      gap:16px;
+      align-items:center;
+      margin:0 0 14px;
+      flex-wrap:wrap;
+    }
+
+    .notice{
+      max-width:57ch;
+      color:var(--muted);
+      font-family:var(--font-body);
+      font-size:.82rem;
+      line-height:1.5;
+    }
+
+    .toast{
+      position:fixed;
+      left:50%;
+      bottom:24px;
+      transform:translateX(-50%) translateY(20px);
+      z-index:120;
+      padding:12px 17px;
+      border-radius:0;
+      background:var(--hvl-dark);
+      color:#fff;
+      border-bottom:4px solid var(--hvl-yellow);
+      opacity:0;
+      pointer-events:none;
+      transition:.2s ease;
+      font-weight:700;
+      font-size:.9rem;
+    }
+
+    .toast.show{
+      opacity:1;
+      transform:translateX(-50%) translateY(0);
+    }
+
+    @media (max-width:1080px){
+      .layout{
+        grid-template-columns:1fr;
+        max-width:980px;
+      }
+
+      .panel{
+        position:relative;
+        top:auto;
+        min-height:auto;
+      }
+
+      .panel-body{
+        max-height:none;
+      }
+
+      .stage{
+        min-height:auto;
+      }
+
+      .wheel-wrap{
+        min-height:575px;
+      }
+    }
+
+    @media (max-width:680px){
+      header{
+        min-height:72px;
+        padding:10px 14px;
+        border-bottom-width:5px;
+      }
+
+      .brand small{
+        display:none;
+      }
+
+      .header-actions{
+        gap:6px;
+      }
+
+      .header-actions .ghost{
+        display:none;
+      }
+
+      header .btn{
+        min-height:40px;
+        padding:8px 10px;
+        font-size:.82rem;
+      }
+
+      .layout{
+        padding:14px 12px 30px;
+        gap:16px;
+      }
+
+      .stage{
+        padding:24px 14px 22px;
+        border-top-width:6px;
+      }
+
+      .stage::before{
+        width:90px;
+        height:14px;
+      }
+
+      h1{
+        font-size:2.55rem;
+        max-width:11ch;
+      }
+
+      .lead{
+        font-size:1rem;
+      }
+
+      .wheel-wrap{
+        min-height:500px;
+      }
+
+      .wheel{
+        width:min(455px,94vw);
+      }
+
+      .wheel-item{
+        width:33%;
+        min-height:58px;
+        padding:7px 6px;
+        font-size:.68rem;
+        transform:
+          translate(-50%,-50%)
+          rotate(var(--a))
+          translateY(-228%)
+          rotate(calc(-1 * var(--a)));
+      }
+
+      .wheel-item:hover,
+      .wheel-item.active{
+        transform:
+          translate(-50%,-50%)
+          rotate(var(--a))
+          translateY(-228%)
+          rotate(calc(-1 * var(--a)))
+          scale(1.025);
+      }
+
+      .panel{
+        border-top-width:6px;
+      }
+
+      .panel-head,
+      .panel-body{
+        padding-left:18px;
+        padding-right:18px;
+      }
+
+      .summary-row{
+        grid-template-columns:1fr;
+        gap:3px;
+      }
+
+      .steps{
+        grid-template-columns:1fr;
+      }
+
+      .modal{
+        padding:26px 18px 22px;
+      }
+
+      .result-toolbar{
+        align-items:flex-start;
+      }
+    }
+
+    @media (prefers-reduced-motion: reduce){
+      *,
+      *::before,
+      *::after{
+        scroll-behavior:auto !important;
+        transition:none !important;
+      }
+    }
+
+  </style>
+</head>
+<body>
+<div class="app">
+  <header>
+    <div class="brand">
+      <div class="brand-mark">S</div>
+      <div>
+        Spinna
+        <small>nynorsk · HVL-inspirert</small>
+      </div>
+    </div>
+    <div class="header-actions">
+      <button class="btn ghost" id="helpBtn">Slik verkar det</button>
+      <button class="btn danger" id="resetBtn">Start nytt forløp</button>
+    </div>
+  </header>
+
+  <main class="layout">
+    <section class="stage">
+      <span class="eyebrow">Undervisningsplanlegging</span>
+      <h1>Set ramma. Få nye undervisningsidéar.</h1>
+      <p class="lead">
+        Vel struktur og fag først. Legg deretter til dei pedagogiske og didaktiske rammene
+        som er relevante for elevgruppa og undervisninga di.
+      </p>
+
+      <div class="statusbar">
+        <span class="status-pill" id="progressPill">0 kategoriar valde</span>
+        <span class="status-pill warn" id="requiredPill">Vel struktur og fag/emne for å koma i gang</span>
+      </div>
+
+      <div class="wheel-wrap">
+        <div class="wheel" id="wheel">
+          <div class="center">
+            <div>
+              <strong>Bygg opplegget</strong>
+              <span>Klikk på eit felt i hjulet</span>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div class="stage-bottom">
+        <button class="btn" id="clearBtn">Rydd alle val</button>
+        <button class="btn primary" id="generateBtn" disabled>Lag undervisningsforslag</button>
+      </div>
+    </section>
+
+    <aside class="panel">
+      <div class="panel-head">
+        <span class="eyebrow" id="panelEyebrow">Kom i gang</span>
+        <h2 id="panelTitle">Vel ein kategori</h2>
+        <p id="panelDesc">Klikk på eit av felta i hjulet. Start gjerne med «Struktur».</p>
+      </div>
+      <div class="panel-body" id="panelBody">
+        <div class="hint">
+          <b>Tre steg:</b><br>
+          1. Vel struktur for resultatet.<br>
+          2. Vel minst eitt fag og skriv gjerne inn emne.<br>
+          3. Legg til dei rammene du ønskjer.
+        </div>
+        <div class="summary">
+          <h3>Vala dine</h3>
+          <div class="summary-items" id="summary"></div>
+        </div>
+      </div>
+    </aside>
+  </main>
+</div>
+
+<div class="modal-backdrop show" id="welcomeModal" aria-modal="true" role="dialog">
+  <div class="modal">
+    <button class="close" data-close="welcomeModal" aria-label="Lukk">×</button>
+    <span class="eyebrow">Velkomen</span>
+    <h2>Planlegg undervisning utan å byrja med ein prompt.</h2>
+    <p>
+      Denne prototypen let deg byggja eit undervisningsopplegg gjennom konkrete val.
+      Du kan bruka han direkte i nettlesaren – ingen data blir sende nokon stad.
+    </p>
+    <div class="steps">
+      <div class="step"><strong>1</strong><b>Vel struktur</b><span>Idéar, aktivitet, leksjonsplan eller forløp.</span></div>
+      <div class="step"><strong>2</strong><b>Vel fag</b><span>Vel eitt eller fleire fag og legg til tema.</span></div>
+      <div class="step"><strong>3</strong><b>Legg til rammer</b><span>Didaktikk, elevmedverknad, vurdering, teknologi m.m.</span></div>
+    </div>
+    <div class="modal-actions">
+      <button class="btn" data-close="welcomeModal">Hopp over</button>
+      <button class="btn primary" id="tourStartBtn">Start med struktur</button>
+    </div>
+  </div>
+</div>
+
+<div class="modal-backdrop result-modal" id="resultModal" aria-modal="true" role="dialog">
+  <div class="modal">
+    <button class="close" data-close="resultModal" aria-label="Lukk">×</button>
+    <span class="eyebrow">Forslag</span>
+    <h2>Undervisningsutkast</h2>
+    <div class="result-toolbar">
+      <div class="notice">Dette er eit lokalt generert utkast basert på vala dine. Tilpass alltid mål, innhald og aktivitetar til elevgruppa og læreplanen.</div>
+      <div>
+        <button class="btn" id="copyBtn">Kopier tekst</button>
+        <button class="btn primary" id="downloadBtn">Last ned .txt</button>
+      </div>
+    </div>
+    <div class="result" id="resultContent"></div>
+  </div>
+</div>
+
+<div class="toast" id="toast">Kopiert</div>
+
+<script>
+const categories = [
+  {
+    id:"struktur", title:"Struktur", required:true,
+    desc:"Kva slags resultat ønskjer du å arbeida vidare med?",
+    mode:"single",
+    options:["10 raske idéar","Aktivitet","Leksjonsplan","Undervisningsforløp"]
+  },
+  {
+    id:"fag", title:"Fagområde, emne", required:true,
+    desc:"Vel eitt eller fleire fag. Du kan òg skriva inn tema og klassesteg.",
+    mode:"multi",
+    options:["Norsk","Matematikk","Engelsk","Naturfag","Samfunnsfag","KRLE","Kunst og handverk","Musikk","Kroppsøving","Mat og helse","Framandspråk","Tverrfagleg"],
+    extra:[
+      {type:"text", key:"emne", label:"Emne / tema", placeholder:"Til dømes berekraft, brøk, argumenterande tekst …"},
+      {type:"select", key:"trinn", label:"Klassesteg", options:["Ikkje valt","1.–2. trinn","3.–4. trinn","5.–7. trinn","8.–10. trinn","Vidaregåande / studentar"]},
+      {type:"textarea", key:"fagnotat", label:"Anna fagleg kontekst", placeholder:"Lokale mål, føresetnader, særlege krav …"}
+    ]
+  },
+  {
+    id:"pedagogikk", title:"Pedagogiske tilnærmingar",
+    desc:"Vel overordna læringssyn eller pedagogiske prinsipp.",
+    mode:"multi",
+    options:["Utforskande læring","Problembasert læring","Prosjektbasert læring","Samarbeidslæring","Sosiokulturell læring","Leikande læring","Skapande / maker","Erfaringslæring","UDL / universell utforming","Restorativ praksis"]
+  },
+  {
+    id:"didaktikk", title:"Didaktiske tilnærmingar",
+    desc:"Vel korleis undervisninga skal strukturerast og læringa arbeidast fram.",
+    mode:"multi",
+    options:["Baklengs planlegging","Induktiv tilnærming","Deduktiv tilnærming","Dialogisk undervisning","Stasjonsundervisning","Multimodal læring","Flipped classroom","Utforskande syklus","Modellering og gradvis frigjering"]
+  },
+  {
+    id:"leiing", title:"Klasseromsleiing",
+    desc:"Legg inn rammer som kan skapa tryggleik, struktur og deltaking.",
+    mode:"multi",
+    options:["Tydleg struktur","Føreseielege overgangar","Relasjonsbygging","Aktive forventningar","Gruppesamansetjing","Tilpassa opplæring","Støtte ved lese- og skrivevanskar","Låg terskel for deltaking"],
+    extra:[{type:"textarea", key:"elevgruppe", label:"Om elevgruppa", placeholder:"Kva bør planen ta omsyn til? Unngå personopplysningar."}]
+  },
+  {
+    id:"innsats", title:"Særlege innsatsar",
+    desc:"Vel ferdigheiter eller område du ønskjer å styrkja.",
+    mode:"multi",
+    options:["Lesing","Skriving","Munnlege ferdigheiter","Rekning","Kritisk tenking","Kjeldekritikk","Digital dømmekraft","Trivsel","Rørsle","Framtidskompetansar","Djupnelæring"]
+  },
+  {
+    id:"stemning", title:"Stemningar, kjensler",
+    desc:"Kva slags oppleving eller energi ønskjer du å skapa?",
+    mode:"multi",
+    options:["Nysgjerrigheit","Ro","Leik","Undring","Mot","Humor","Fordjuping","Meistring","Spenning","Tilhøyrsle"]
+  },
+  {
+    id:"rom", title:"Rom",
+    desc:"Kvar skal læringa føregå?",
+    mode:"multi",
+    options:["Klasserom","Uteområde","Skulegarden","Bibliotek","Verkstad / makerspace","Kjøken","Gymsal","Nærmiljø","Digitalt rom","Hybrid undervisning"]
+  },
+  {
+    id:"medverknad", title:"Elevmedverknad",
+    desc:"Vel korleis elevane skal få påverka, skapa eller vurdera.",
+    mode:"multi",
+    options:["Val mellom oppgåver","Medbestemming","Elevspørsmål styrer undersøkinga","Elevskapte produkt","Læringspartnar","Kameratrespons","Elevane underviser kvarandre","Felles kriterium","Eigenvurdering"]
+  },
+  {
+    id:"vurdering", title:"Vurdering",
+    desc:"Vel korleis læring kan fangast opp undervegs eller til slutt.",
+    mode:"multi",
+    options:["Exit-lapp","Observasjon","Læringssamtale","Eigenvurdering","Kameratvurdering","Vurderingsrubrikk","Omgrepskart","Mini-whiteboard","Kort quiz","Produkt / framføring"]
+  },
+  {
+    id:"teknologi", title:"Teknologi, materiale",
+    desc:"Vel ressursar og medium som skal eller ikkje skal inngå.",
+    mode:"multi",
+    options:["Utan skjerm","Papir og papp","Konkrete materiale","Nettbrett / PC","Lydopptak","Video","Programmering","KI-verktøy","VR / AR","Sensorar / datalogging","Samskrivingsverktøy"]
+  }
+];
+
+const state = {
+  selected: {},
+  extras: {},
+  active: null
+};
+
+categories.forEach(c => state.selected[c.id] = []);
+
+const wheel = document.getElementById("wheel");
+const panelTitle = document.getElementById("panelTitle");
+const panelDesc = document.getElementById("panelDesc");
+const panelEyebrow = document.getElementById("panelEyebrow");
+const panelBody = document.getElementById("panelBody");
+const summary = document.getElementById("summary");
+const generateBtn = document.getElementById("generateBtn");
+const progressPill = document.getElementById("progressPill");
+const requiredPill = document.getElementById("requiredPill");
+
+function buildWheel(){
+  categories.forEach((cat, i)=>{
+    const angle = (360/categories.length)*i;
+    const btn = document.createElement("button");
+    btn.className = "wheel-item";
+    btn.style.setProperty("--a", `${angle}deg`);
+    btn.dataset.id = cat.id;
+    btn.dataset.count = "0";
+    btn.innerHTML = cat.title.replace(", ","<br>");
+    btn.addEventListener("click", ()=> openCategory(cat.id));
+    wheel.appendChild(btn);
+  });
+}
+
+function openCategory(id){
+  state.active = id;
+  const cat = categories.find(c=>c.id===id);
+  document.querySelectorAll(".wheel-item").forEach(b=>b.classList.toggle("active", b.dataset.id===id));
+  panelEyebrow.textContent = cat.required ? "Påkravd val" : "Valfri ramme";
+  panelTitle.textContent = cat.title;
+  panelDesc.textContent = cat.desc;
+
+  const body = document.createElement("div");
+
+  const grid = document.createElement("div");
+  grid.className = "option-grid";
+  cat.options.forEach(opt=>{
+    const chip = document.createElement("button");
+    chip.className = "chip" + (state.selected[id].includes(opt) ? " selected" : "");
+    chip.textContent = opt;
+    chip.addEventListener("click", ()=>{
+      if(cat.mode==="single"){
+        state.selected[id] = state.selected[id].includes(opt) ? [] : [opt];
+      } else {
+        state.selected[id] = state.selected[id].includes(opt)
+          ? state.selected[id].filter(x=>x!==opt)
+          : [...state.selected[id], opt];
+      }
+      openCategory(id);
+      updateUI();
+    });
+    grid.appendChild(chip);
+  });
+  body.appendChild(grid);
+
+  (cat.extra || []).forEach(field=>{
+    const wrap = document.createElement("div");
+    wrap.className = "field";
+    const lab = document.createElement("label");
+    lab.textContent = field.label;
+    wrap.appendChild(lab);
+    let el;
+    if(field.type==="textarea"){
+      el=document.createElement("textarea");
+      el.placeholder=field.placeholder || "";
+    } else if(field.type==="select"){
+      el=document.createElement("select");
+      field.options.forEach(o=>{
+        const option=document.createElement("option");
+        option.textContent=o; option.value=o;
+        el.appendChild(option);
+      });
+    } else {
+      el=document.createElement("input");
+      el.type="text"; el.placeholder=field.placeholder || "";
+    }
+    el.value = state.extras[field.key] || "";
+    el.addEventListener("input", ()=>{
+      state.extras[field.key]=el.value;
+      updateUI();
+    });
+    wrap.appendChild(el);
+    if(field.key==="elevgruppe"){
+      const helper=document.createElement("div");
+      helper.className="helper";
+      helper.textContent="Skriv berre pedagogisk relevant informasjon. Ikkje legg inn namn eller andre personopplysningar.";
+      wrap.appendChild(helper);
+    }
+    body.appendChild(wrap);
+  });
+
+  const sum = document.createElement("div");
+  sum.className="summary";
+  sum.innerHTML="<h3>Vala dine</h3><div class='summary-items' id='summary'></div>";
+  body.appendChild(sum);
+
+  panelBody.innerHTML="";
+  panelBody.appendChild(body);
+  renderSummary(panelBody.querySelector("#summary"));
+}
+
+function renderSummary(target=summary){
+  if(!target) return;
+  target.innerHTML="";
+  const rows = categories
+    .map(cat=>{
+      const values = state.selected[cat.id];
+      if(!values.length) return null;
+      return {label:cat.title, value:values.join(", ")};
+    }).filter(Boolean);
+
+  if(state.extras.emne) rows.push({label:"Emne",value:state.extras.emne});
+  if(state.extras.trinn && state.extras.trinn!=="Ikkje valt") rows.push({label:"Klassesteg",value:state.extras.trinn});
+
+  if(!rows.length){
+    target.innerHTML="<div class='hint'>Ingen val enno.</div>";
+    return;
+  }
+  rows.forEach(r=>{
+    const div=document.createElement("div");
+    div.className="summary-row";
+    div.innerHTML=`<b>${escapeHtml(r.label)}</b><span>${escapeHtml(r.value)}</span>`;
+    target.appendChild(div);
+  });
+}
+
+function updateUI(){
+  categories.forEach(cat=>{
+    const btn=document.querySelector(`.wheel-item[data-id="${cat.id}"]`);
+    const count=state.selected[cat.id].length;
+    btn.dataset.count=count;
+    btn.classList.toggle("has-value",count>0);
+  });
+  const chosenCats=categories.filter(c=>state.selected[c.id].length).length;
+  progressPill.textContent=`${chosenCats} ${chosenCats===1?"kategori":"kategoriar"} valde`;
+
+  const hasStructure=state.selected.struktur.length>0;
+  const hasSubject=state.selected.fag.length>0 || !!state.extras.emne;
+  generateBtn.disabled=!(hasStructure && hasSubject);
+
+  if(!hasStructure && !hasSubject){
+    requiredPill.textContent="Vel struktur og fag/emne for å koma i gang";
+  } else if(!hasStructure){
+    requiredPill.textContent="Du manglar struktur";
+  } else if(!hasSubject){
+    requiredPill.textContent="Du manglar fag eller emne";
+  } else {
+    requiredPill.textContent="Klar til å laga forslag";
+    requiredPill.classList.remove("warn");
+  }
+  document.querySelectorAll(".summary-items").forEach(el=>renderSummary(el));
+}
+
+function resetAll(){
+  categories.forEach(c=>state.selected[c.id]=[]);
+  state.extras={};
+  state.active=null;
+  document.querySelectorAll(".wheel-item").forEach(b=>b.classList.remove("active"));
+  panelEyebrow.textContent="Kom i gang";
+  panelTitle.textContent="Vel ein kategori";
+  panelDesc.textContent="Klikk på eit av felta i hjulet. Start gjerne med «Struktur».";
+  panelBody.innerHTML=`
+    <div class="hint">
+      <b>Tre steg:</b><br>
+      1. Vel struktur for resultatet.<br>
+      2. Vel minst eitt fag og skriv gjerne inn emne.<br>
+      3. Legg til dei rammene du ønskjer.
+    </div>
+    <div class="summary"><h3>Vala dine</h3><div class="summary-items" id="summary"></div></div>`;
+  updateUI();
+}
+
+function join(list, fallback="ikkje spesifisert"){
+  return list && list.length ? list.join(", ") : fallback;
+}
+function sentenceList(list){
+  if(!list || !list.length) return "";
+  if(list.length===1) return list[0];
+  return list.slice(0,-1).join(", ")+" og "+list.at(-1);
+}
+function escapeHtml(str=""){
+  return String(str).replace(/[&<>"']/g, m=>({"&":"&amp;","<":"&lt;",">":"&gt;","\"":"&quot;","'":"&#039;"}[m]));
+}
+
+function buildPlan(){
+  const structure=state.selected.struktur[0] || "Undervisningsopplegg";
+  const subjects=join(state.selected.fag);
+  const topic=state.extras.emne || "eit relevant fagleg tema";
+  const grade=(state.extras.trinn && state.extras.trinn!=="Ikkje valt") ? state.extras.trinn : "vald elevgruppe";
+
+  const pedagogy=state.selected.pedagogikk;
+  const didactics=state.selected.didaktikk;
+  const management=state.selected.leiing;
+  const efforts=state.selected.innsats;
+  const moods=state.selected.stemning;
+  const rooms=state.selected.rom;
+  const participation=state.selected.medverknad;
+  const assessment=state.selected.vurdering;
+  const tech=state.selected.teknologi;
+
+  let purpose = `Elevane skal arbeida med ${topic} i ${subjects}, med vekt på å forstå, utforska og kunna bruka sentrale omgrep eller ferdigheiter i ein meiningsfull samanheng.`;
+  if(efforts.length) purpose += ` Opplegget skal særleg støtta ${sentenceList(efforts).toLowerCase()}.`;
+
+  let opening = moods.length
+    ? `Start med eit kort anslag som skaper ${sentenceList(moods).toLowerCase()}. Presenter eit spørsmål, fenomen, bilete, gjenstand eller problem som elevane kan reagera på før læraren forklarer for mykje.`
+    : `Start med eit kort anslag: eit spørsmål, fenomen, bilete, gjenstand eller problem som vekkjer nysgjerrigheit og gjer temaet relevant.`;
+
+  let main = participation.length
+    ? `La elevane få ei aktiv rolle gjennom ${sentenceList(participation).toLowerCase()}. Arbeidet kan organiserast i korte fasar: utforsking, idéutvikling, utprøving og deling.`
+    : `La elevane arbeida aktivt med ei oppgåve der dei må undersøka, prøva ut, forklara og dela tankane sine med andre.`;
+
+  if(pedagogy.length) main += ` Den pedagogiske retninga er ${sentenceList(pedagogy).toLowerCase()}.`;
+  if(didactics.length) main += ` Didaktisk kan opplegget byggja på ${sentenceList(didactics).toLowerCase()}.`;
+
+  let teacher = `Læraren set tydelege rammer, modellerer det som trengst, stiller opne oppfølgingsspørsmål og bruker observasjonar frå elevane sitt arbeid til å justera støtta undervegs.`;
+  if(management.length) teacher += ` Ha særleg merksemd på ${sentenceList(management).toLowerCase()}.`;
+  if(state.extras.elevgruppe) teacher += ` Omsyn til elevgruppa: ${state.extras.elevgruppe}`;
+
+  let ending = assessment.length
+    ? `Avslutt med ${sentenceList(assessment).toLowerCase()} for å synleggjera kva elevane har forstått, kva dei framleis lurer på, og kva som bør følgjast opp vidare.`
+    : `Avslutt med ei kort oppsummering der elevane formulerer kva dei har lært, kva som overraska dei, og eitt spørsmål dei framleis har.`;
+
+  let resources = [];
+  if(rooms.length) resources.push(`rom: ${join(rooms)}`);
+  if(tech.length) resources.push(`teknologi/materiale: ${join(tech)}`);
+  const resourceText = resources.length ? resources.join(" · ") : "Vel ressursar ut frå lokale rammer og fagleg føremål.";
+
+  let body="";
+  if(structure==="10 raske idéar"){
+    const ideaSeeds = [
+      "Gjer temaet om til eit mysterium elevane må løysa.",
+      "La elevane laga tre moglege forklaringar og testa kva som held.",
+      "Bruk eit konkret objekt eller bilete som startpunkt for faglege spørsmål.",
+      "La elevane laga eit produkt for ein ekte mottakar.",
+      "Lag ein fysisk stasjon der elevane samlar data eller observasjonar.",
+      "La elevane samanlikna to motstridande forklaringar eller perspektiv.",
+      "Be elevane laga ein enkel modell, skisse eller prototype.",
+      "La elevane undervisa ein annan gruppe i det viktigaste dei har funne ut.",
+      "Avslutt med at elevane endrar eller forbetrar den første ideen sin.",
+      "Knyt temaet til nærmiljøet, kvardagen eller ei aktuell problemstilling."
+    ];
+    body = `<h3>10 raske idéar</h3><ul>${ideaSeeds.map(x=>`<li>${escapeHtml(x)}</li>`).join("")}</ul>`;
+  } else if(structure==="Aktivitet"){
+    body = `
+      <h3>Aktivitet – 30–45 minutt</h3>
+      <ul>
+        <li><b>5 min:</b> ${escapeHtml(opening)}</li>
+        <li><b>20–30 min:</b> ${escapeHtml(main)}</li>
+        <li><b>5–10 min:</b> ${escapeHtml(ending)}</li>
+      </ul>`;
+  } else if(structure==="Leksjonsplan"){
+    body = `
+      <h3>Leksjonsplan – om lag 60 minutt</h3>
+      <ul>
+        <li><b>0–10 min:</b> ${escapeHtml(opening)}</li>
+        <li><b>10–20 min:</b> Felles klargjering av oppdrag, omgrep og kriterium.</li>
+        <li><b>20–45 min:</b> ${escapeHtml(main)}</li>
+        <li><b>45–55 min:</b> Deling, samanlikning og fagleg samtale.</li>
+        <li><b>55–60 min:</b> ${escapeHtml(ending)}</li>
+      </ul>`;
+  } else {
+    body = `
+      <h3>Forslag til undervisningsforløp</h3>
+      <ul>
+        <li><b>Fase 1 – opning og undring:</b> ${escapeHtml(opening)}</li>
+        <li><b>Fase 2 – utforsking:</b> Elevane samlar informasjon, testar idear og utviklar faglege spørsmål.</li>
+        <li><b>Fase 3 – skaping og bearbeiding:</b> ${escapeHtml(main)}</li>
+        <li><b>Fase 4 – deling og respons:</b> Elevane viser fram førebelse løysingar og får respons frå medelevar og lærar.</li>
+        <li><b>Fase 5 – revisjon og vurdering:</b> ${escapeHtml(ending)}</li>
+      </ul>`;
+  }
+
+  const contextNotes = [state.extras.fagnotat].filter(Boolean).join(" ");
+
+  return `
+    <h3>Kontekst</h3>
+    <p><b>${escapeHtml(structure)}</b> for <b>${escapeHtml(grade)}</b> i <b>${escapeHtml(subjects)}</b>. Tema: <b>${escapeHtml(topic)}</b>.</p>
+    ${contextNotes ? `<p>${escapeHtml(contextNotes)}</p>` : ""}
+
+    <h3>Mål og retning</h3>
+    <p>${escapeHtml(purpose)}</p>
+
+    ${body}
+
+    <h3>Lærarrolla</h3>
+    <p>${escapeHtml(teacher)}</p>
+
+    <h3>Ressursar og læringsrom</h3>
+    <p>${escapeHtml(resourceText)}</p>
+
+    <h3>Vidare tilpassing</h3>
+    <p>Kontroller at aktivitetane heng saman med kompetansemål, elevane sine forkunnskapar og tida du faktisk har. Fjern element som ikkje støttar målet, og legg inn konkret faginnhald før gjennomføring.</p>
+  `;
+}
+
+function stripHtml(html){
+  const temp=document.createElement("div");
+  temp.innerHTML=html;
+  return temp.innerText;
+}
+
+function showToast(text){
+  const t=document.getElementById("toast");
+  t.textContent=text;
+  t.classList.add("show");
+  clearTimeout(window.__toast);
+  window.__toast=setTimeout(()=>t.classList.remove("show"),1600);
+}
+
+buildWheel();
+updateUI();
+
+document.querySelectorAll("[data-close]").forEach(btn=>{
+  btn.addEventListener("click", ()=>document.getElementById(btn.dataset.close).classList.remove("show"));
+});
+document.getElementById("helpBtn").addEventListener("click", ()=>document.getElementById("welcomeModal").classList.add("show"));
+document.getElementById("tourStartBtn").addEventListener("click", ()=>{
+  document.getElementById("welcomeModal").classList.remove("show");
+  openCategory("struktur");
+});
+document.getElementById("resetBtn").addEventListener("click", resetAll);
+document.getElementById("clearBtn").addEventListener("click", resetAll);
+
+document.getElementById("generateBtn").addEventListener("click", ()=>{
+  document.getElementById("resultContent").innerHTML=buildPlan();
+  document.getElementById("resultModal").classList.add("show");
+});
+document.getElementById("copyBtn").addEventListener("click", async ()=>{
+  const text=stripHtml(document.getElementById("resultContent").innerHTML);
+  try{
+    await navigator.clipboard.writeText(text);
+    showToast("Kopiert til utklippstavla");
+  }catch{
+    showToast("Kunne ikkje kopiera automatisk");
+  }
+});
+document.getElementById("downloadBtn").addEventListener("click", ()=>{
+  const text=stripHtml(document.getElementById("resultContent").innerHTML);
+  const blob=new Blob([text],{type:"text/plain;charset=utf-8"});
+  const url=URL.createObjectURL(blob);
+  const a=document.createElement("a");
+  a.href=url;
+  a.download="undervisningsutkast.txt";
+  a.click();
+  URL.revokeObjectURL(url);
+});
+
+document.addEventListener("keydown", e=>{
+  if(e.key==="Escape"){
+    document.querySelectorAll(".modal-backdrop.show").forEach(m=>m.classList.remove("show"));
+  }
+});
+</script>
+</body>
+</html>
